@@ -207,6 +207,10 @@ BindIP                       = "0.0.0.0"
 #        Default: 1 (Enable)
 #                 0 (Disabled)
 #
+#    MaxWhoListReturns
+#        Set the max number of players returned in the /who list and interface (0 means unlimited)
+#        Default:     49 - (stable)
+#
 ################################################################################
 
 UseProcessors                     = 0
@@ -236,6 +240,7 @@ UpdateUptimeInterval              = 10
 MaxCoreStuckTime                  = 0
 AddonChannel                      = 1
 CleanCharacterDB                  = 1
+MaxWhoListReturns                 = 49
 
 ################################################################################
 # SERVER LOGGING
@@ -1158,6 +1163,10 @@ Channel.SilentlyGMJoin          = 0
 #        A spell that will be cast when a gm uses ".gm visible off" (Must be aura spell)
 #        Default: 31748 (Spirit Particles, big)
 #                 0 (Disabled)
+#	 GM.MaxSpeedFactor
+#		Set the max speed factor whend using commands .mod speed / .mod aspeed  etc...
+#		Only Integer values
+#		Default: 10
 #
 ################################################################################
 
@@ -1174,6 +1183,7 @@ GM.LogTrade              = 1
 GM.StartLevel            = 1
 GM.LowerSecurity         = 0
 GM.InvisibleAura         = 31748
+GM.MaxSpeedFactor		 = 10
 
 ################################################################################
 # VISIBILITY AND RADIUSES

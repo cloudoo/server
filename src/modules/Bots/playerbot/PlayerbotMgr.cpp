@@ -13,7 +13,9 @@ class CharacterHandler;
 PlayerbotHolder::PlayerbotHolder() : PlayerbotAIBase()
 {
     for (uint32 spellId = 0; spellId < sSpellStore.GetNumRows(); spellId++)
+    {
         sSpellStore.LookupEntry(spellId);
+    }
 }
 
 PlayerbotHolder::~PlayerbotHolder()
@@ -47,7 +49,10 @@ void PlayerbotHolder::LogoutAllBots()
     while (true)
     {
         PlayerBotMap::const_iterator itr = GetPlayerBotsBegin();
-        if (itr == GetPlayerBotsEnd()) break;
+        if (itr == GetPlayerBotsEnd())
+        {
+            break;
+        }
         Player* bot= itr->second;
         LogoutPlayerBot(bot->GetObjectGuid().GetRawValue());
     }
@@ -123,18 +128,24 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
 bool PlayerbotHolder::ProcessBotCommand(string cmd, ObjectGuid guid, bool admin, uint32 masterAccountId)
 {
     if (!sPlayerbotAIConfig.enabled || guid.IsEmpty())
+    {
         return false;
+    }
 
     bool isRandomBot = sRandomPlayerbotMgr.IsRandomBot(guid);
     bool isRandomAccount = sPlayerbotAIConfig.IsInRandomAccountList(sObjectMgr.GetPlayerAccountIdByGUID(guid));
 
     if (isRandomAccount && !isRandomBot && !admin)
+    {
         return false;
+    }
 
     if (cmd == "add" || cmd == "login")
     {
         if (sObjectMgr.GetPlayer(guid))
+        {
             return false;
+        }
 
         AddPlayerBot(guid.GetRawValue(), masterAccountId);
         return true;
@@ -142,7 +153,9 @@ bool PlayerbotHolder::ProcessBotCommand(string cmd, ObjectGuid guid, bool admin,
     else if (cmd == "remove" || cmd == "logout" || cmd == "rm")
     {
         if (!GetPlayerBot(guid.GetRawValue()))
+        {
             return false;
+        }
 
         LogoutPlayerBot(guid.GetRawValue());
         return true;
@@ -152,7 +165,9 @@ bool PlayerbotHolder::ProcessBotCommand(string cmd, ObjectGuid guid, bool admin,
     {
         Player* bot = GetPlayerBot(guid.GetRawValue());
         if (!bot)
+        {
             return false;
+        }
 
         Player* master = bot->GetPlayerbotAI()->GetMaster();
         if (master)
@@ -226,7 +241,9 @@ bool ChatHandler::HandlePlayerbotCommand(char* args)
 
     list<string> messages = mgr->HandlePlayerbotCommand(args, player);
     if (messages.empty())
+    {
         return true;
+    }
 
     for (list<string>::iterator i = messages.begin(); i != messages.end(); ++i)
     {
@@ -273,11 +290,15 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char* args, Player* master)
             ObjectGuid member = i->guid;
 
             if (member == master->GetObjectGuid())
+            {
                 continue;
+            }
 
             string bot;
             if (sObjectMgr.GetPlayerNameByGUID(member, bot))
+            {
                 bots.insert(bot);
+            }
         }
     }
 
@@ -287,7 +308,9 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char* args, Player* master)
         {
             Player* bot = i->second;
             if (bot && bot->IsInWorld())
+            {
                 bots.insert(bot->GetName());
+            }
         }
     }
 
@@ -304,7 +327,7 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char* args, Player* master)
         }
 
         QueryResult* results = CharacterDatabase.PQuery(
-            "SELECT name FROM characters WHERE account = '%u'",
+            "SELECT `name` FROM `characters` WHERE `account` = '%u'",
             accountId);
         if (results)
         {
@@ -347,7 +370,7 @@ uint32 PlayerbotHolder::GetAccountId(string name)
 {
     uint32 accountId = 0;
 
-    QueryResult *results = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'", name.c_str());
+    QueryResult *results = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` = '%s'", name.c_str());
     if(results)
     {
         Field* fields = results->Fetch();
@@ -377,7 +400,9 @@ void PlayerbotMgr::HandleCommand(uint32 type, const string& text)
 {
     Player *master = GetMaster();
     if (!master)
+    {
         return;
+    }
 
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
@@ -389,7 +414,9 @@ void PlayerbotMgr::HandleCommand(uint32 type, const string& text)
     {
         Player* const bot = it->second;
         if (bot->GetPlayerbotAI()->GetMaster() == master)
+        {
             bot->GetPlayerbotAI()->HandleCommand(type, text, *master);
+        }
     }
 }
 
@@ -405,7 +432,9 @@ void PlayerbotMgr::HandleMasterIncomingPacket(const WorldPacket& packet)
     {
         Player* const bot = it->second;
         if (bot->GetPlayerbotAI()->GetMaster() == GetMaster())
+        {
             bot->GetPlayerbotAI()->HandleMasterIncomingPacket(packet);
+        }
     }
 
     switch (packet.GetOpcode())
@@ -430,7 +459,9 @@ void PlayerbotMgr::HandleMasterOutgoingPacket(const WorldPacket& packet)
     {
         Player* const bot = it->second;
         if (bot->GetPlayerbotAI()->GetMaster() == GetMaster())
+        {
             bot->GetPlayerbotAI()->HandleMasterOutgoingPacket(packet);
+        }
     }
 }
 
@@ -445,7 +476,9 @@ void PlayerbotMgr::SaveToDB()
     {
         Player* const bot = it->second;
         if (bot->GetPlayerbotAI()->GetMaster() == GetMaster())
+        {
             bot->SaveToDB();
+        }
     }
 }
 

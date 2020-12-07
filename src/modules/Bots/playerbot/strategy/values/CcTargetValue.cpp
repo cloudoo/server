@@ -20,14 +20,20 @@ public:
     {
         Player* bot = ai->GetBot();
         if (*ai->GetAiObjectContext()->GetValue<Unit*>("current target") == creature)
+        {
             return;
+        }
 
         uint8 health = creature->GetHealthPercent();
         if (health < sPlayerbotAIConfig.mediumHealth)
+        {
             return;
+        }
 
         if (!ai->CanCastSpell(spell, creature))
+        {
             return;
+        }
 
         if (*ai->GetAiObjectContext()->GetValue<Unit*>("rti target") == creature)
         {
@@ -38,7 +44,9 @@ public:
         float minDistance = sPlayerbotAIConfig.spellDistance;
         Group* group = bot->GetGroup();
         if (!group)
+        {
             return;
+        }
 
         if (group->GetTargetIcon(4) == creature->GetObjectGuid())
         {
@@ -59,14 +67,20 @@ public:
         {
             Player *member = sObjectMgr.GetPlayer(itr->guid);
             if( !member || !member->IsAlive() || member == bot)
+            {
                 continue;
+            }
 
             if (!ai->IsTank(member))
+            {
                 continue;
+            }
 
             float distance = member->GetDistance(creature);
             if (distance < minDistance)
+            {
                 minDistance = distance;
+            }
         }
 
         if (!result || minDistance > maxDistance)

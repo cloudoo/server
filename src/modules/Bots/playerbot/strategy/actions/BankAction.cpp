@@ -16,7 +16,9 @@ bool BankAction::Execute(Event event)
     {
         Unit* npc = ai->GetUnit(*i);
         if (!npc || !bot->GetNPCIfCanInteractWith(npc->GetObjectGuid(), UNIT_NPC_FLAG_BANKER))
+        {
             continue;
+        }
 
         return Execute(text, npc);
     }
@@ -47,13 +49,17 @@ bool BankAction::Execute(string text, Unit* bank)
     {
         list<Item*> found = parseItems(text);
         if (found.empty())
+        {
             return false;
+        }
 
         for (list<Item*>::iterator i = found.begin(); i != found.end(); i++)
         {
             Item* item = *i;
             if (!item)
+            {
                 continue;
+            }
 
             result &= Deposit(item);
         }
@@ -66,7 +72,9 @@ bool BankAction::Withdraw(const uint32 itemid)
 {
     Item* pItem = FindItemInBank(itemid);
     if (!pItem)
+    {
         return false;
+    }
 
     ItemPosCountVec dest;
     InventoryResult msg = bot->CanStoreItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
@@ -122,7 +130,9 @@ void BankAction::ListItems()
             {
                 Item* const item = bot->GetItemByPos(bag, slot);
                 if (item)
+                {
                     items[item->GetProto()->ItemId] = item->GetCount();
+                }
             }
         }
     }
@@ -139,10 +149,14 @@ Item* BankAction::FindItemInBank(uint32 ItemId)
         {
             const ItemPrototype* const pItemProto = pItem->GetProto();
             if (!pItemProto)
+            {
                 continue;
+            }
 
             if (pItemProto->ItemId == ItemId)   // have required item
+            {
                 return pItem;
+            }
         }
     }
 
@@ -157,10 +171,14 @@ Item* BankAction::FindItemInBank(uint32 ItemId)
                 {
                     const ItemPrototype* const pItemProto = pItem->GetProto();
                     if (!pItemProto)
+                    {
                         continue;
+                    }
 
                     if (pItemProto->ItemId == ItemId)
+                    {
                         return pItem;
+                    }
                 }
             }
     }

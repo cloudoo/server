@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2019  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2020 MaNGOS <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 #ifndef MANGOS_H_REVISION
 #define MANGOS_H_REVISION
-    #define REVISION_NR "2116016"
+    #define REVISION_NR "2122024"
 
     #define REALMD_DB_VERSION_NR 21
     #define REALMD_DB_STRUCTURE_NR 2
@@ -37,7 +37,7 @@
     #define CHAR_DB_UPDATE_DESCRIPTION "Add_Field_Comments"
 
     #define WORLD_DB_VERSION_NR 21
-    #define WORLD_DB_STRUCTURE_NR 16
-    #define WORLD_DB_CONTENT_NR 016
-    #define WORLD_DB_UPDATE_DESCRIPTION "Fix typo in quest 5064"
+    #define WORLD_DB_STRUCTURE_NR 22
+    #define WORLD_DB_CONTENT_NR 024
+    #define WORLD_DB_UPDATE_DESCRIPTION "NPC_1434_position_fix"
 #endif // __REVISION_H__

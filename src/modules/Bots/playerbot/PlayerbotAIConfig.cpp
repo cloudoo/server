@@ -21,7 +21,9 @@ void LoadList(string value, T &list)
     {
         uint32 id = atoi((*i).c_str());
         if (!id)
+        {
             continue;
+        }
 
         list.push_back(id);
     }
@@ -145,36 +147,64 @@ string PlayerbotAIConfig::GetValue(string name)
     ostringstream out;
 
     if (name == "GlobalCooldown")
+    {
         out << globalCoolDown;
+    }
     else if (name == "ReactDelay")
+    {
         out << reactDelay;
+    }
 
     else if (name == "SightDistance")
+    {
         out << sightDistance;
+    }
     else if (name == "SpellDistance")
+    {
         out << spellDistance;
+    }
     else if (name == "ReactDistance")
+    {
         out << reactDistance;
+    }
     else if (name == "GrindDistance")
+    {
         out << grindDistance;
+    }
     else if (name == "LootDistance")
+    {
         out << lootDistance;
+    }
     else if (name == "FleeDistance")
+    {
         out << fleeDistance;
+    }
 
     else if (name == "CriticalHealth")
+    {
         out << criticalHealth;
+    }
     else if (name == "LowHealth")
+    {
         out << lowHealth;
+    }
     else if (name == "MediumHealth")
+    {
         out << mediumHealth;
+    }
     else if (name == "AlmostFullHealth")
+    {
         out << almostFullHealth;
+    }
     else if (name == "LowMana")
+    {
         out << lowMana;
+    }
 
     else if (name == "IterationsPerTick")
+    {
         out << iterationsPerTick;
+    }
 
     return out.str();
 }
@@ -184,36 +214,64 @@ void PlayerbotAIConfig::SetValue(string name, string value)
     istringstream out(value, istringstream::in);
 
     if (name == "GlobalCooldown")
+    {
         out >> globalCoolDown;
+    }
     else if (name == "ReactDelay")
+    {
         out >> reactDelay;
+    }
 
     else if (name == "SightDistance")
+    {
         out >> sightDistance;
+    }
     else if (name == "SpellDistance")
+    {
         out >> spellDistance;
+    }
     else if (name == "ReactDistance")
+    {
         out >> reactDistance;
+    }
     else if (name == "GrindDistance")
+    {
         out >> grindDistance;
+    }
     else if (name == "LootDistance")
+    {
         out >> lootDistance;
+    }
     else if (name == "FleeDistance")
+    {
         out >> fleeDistance;
+    }
 
     else if (name == "CriticalHealth")
+    {
         out >> criticalHealth;
+    }
     else if (name == "LowHealth")
+    {
         out >> lowHealth;
+    }
     else if (name == "MediumHealth")
+    {
         out >> mediumHealth;
+    }
     else if (name == "AlmostFullHealth")
+    {
         out >> almostFullHealth;
+    }
     else if (name == "LowMana")
+    {
         out >> lowMana;
+    }
 
     else if (name == "IterationsPerTick")
+    {
         out >> iterationsPerTick;
+    }
 }
 
 
@@ -225,7 +283,7 @@ void PlayerbotAIConfig::CreateRandomBots()
     if (config.GetBoolDefault("AiPlayerbot.DeleteRandomBotAccounts", false))
     {
         sLog.outBasic("Deleting random bot accounts...");
-        QueryResult *results = LoginDatabase.PQuery("SELECT id FROM account where username like '%s%%'", randomBotAccountPrefix.c_str());
+        QueryResult *results = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` LIKE '%s%%'", randomBotAccountPrefix.c_str());
         if (results)
         {
             do
@@ -237,7 +295,7 @@ void PlayerbotAIConfig::CreateRandomBots()
             delete results;
         }
 
-        CharacterDatabase.Execute("DELETE FROM ai_playerbot_random_bots");
+        CharacterDatabase.Execute("DELETE FROM `ai_playerbot_random_bots`");
         sLog.outBasic("Random bot accounts deleted");
     }
 
@@ -245,7 +303,7 @@ void PlayerbotAIConfig::CreateRandomBots()
     {
         ostringstream out; out << randomBotAccountPrefix << accountNumber;
         string accountName = out.str();
-        QueryResult *results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", accountName.c_str());
+        QueryResult *results = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` = '%s'", accountName.c_str());
         if (results)
         {
             delete results;
@@ -262,7 +320,7 @@ void PlayerbotAIConfig::CreateRandomBots()
         sLog.outDetail("Account %s created for random bots", accountName.c_str());
     }
 
-    LoginDatabase.PExecute("UPDATE account SET expansion = '%u', playerbot = %u where username like '%s%%'", 0,true, randomBotAccountPrefix.c_str());
+    LoginDatabase.PExecute("UPDATE `account` SET `expansion` = '%u', `playerbot` = %u WHERE `username` LIKE '%s%%'", 0,true, randomBotAccountPrefix.c_str());
 
     int totalRandomBotChars = 0;
     for (int accountNumber = 0; accountNumber < randomBotAccountCount; ++accountNumber)
@@ -270,9 +328,11 @@ void PlayerbotAIConfig::CreateRandomBots()
         ostringstream out; out << randomBotAccountPrefix << accountNumber;
         string accountName = out.str();
 
-        QueryResult *results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", accountName.c_str());
+        QueryResult *results = LoginDatabase.PQuery("SELECT `id` FROM `account` WHERE `username` = '%s'", accountName.c_str());
         if (!results)
+        {
             continue;
+        }
 
         Field* fields = results->Fetch();
         uint32 accountId = fields[0].GetUInt32();
@@ -291,7 +351,9 @@ void PlayerbotAIConfig::CreateRandomBots()
         for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES; ++cls)
         {
             if (cls != 10 && cls != 6)
+            {
                 factory.CreateRandomBot(cls);
+            }
         }
 
         totalRandomBotChars += sAccountMgr.GetCharactersCount(accountId);

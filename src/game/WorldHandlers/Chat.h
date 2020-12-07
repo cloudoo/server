@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2019  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2020 MaNGOS <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
+#include "Language.h"
 
 struct AreaTrigger;
 struct AreaTriggerEntry;
@@ -51,12 +52,31 @@ class Unit;
 class ChatCommand
 {
     public:
-        const char*        Name;
+        uint32             Id;
+        const char* Name;
         uint32             SecurityLevel;                   // function pointer required correct align (use uint32)
         bool               AllowConsole;
-        bool (ChatHandler::*Handler)(char* args);
+        bool (ChatHandler::* Handler)(char* args);
         std::string        Help;
-        ChatCommand*       ChildCommands;
+        ChatCommand* ChildCommands;
+
+        ChatCommand(
+          const char* pName,
+          uint32 pSecurityLevel,
+          bool pAllowConsole,
+          bool (ChatHandler::* pHandler)(char* args),
+          std::string pHelp,
+          ChatCommand* pChildCommands
+        )
+         : Id(-1)
+        {
+          Name = pName;
+          SecurityLevel = pSecurityLevel;
+          AllowConsole = pAllowConsole;
+          Handler = pHandler;
+          Help = pHelp;
+          ChildCommands = pChildCommands;
+        }
 };
 
 enum ChatCommandSearchResult
@@ -74,6 +94,57 @@ enum PlayerChatTag
     CHAT_TAG_GM                 = 3,
 };
 typedef uint32 ChatTagFlags;
+
+static const uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
+{
+    LANG_REP_HATED,    LANG_REP_HOSTILE, LANG_REP_UNFRIENDLY, LANG_REP_NEUTRAL,
+    LANG_REP_FRIENDLY, LANG_REP_HONORED, LANG_REP_REVERED,    LANG_REP_EXALTED
+};
+
+#define RESET_ITEMS_COMMAND_ARG_OPTION_EQUIPED "equiped"
+#define RESET_ITEMS_COMMAND_ARG_OPTION_BAGS "bags"
+#define RESET_ITEMS_COMMAND_ARG_OPTION_BANK "bank"
+#define RESET_ITEMS_COMMAND_ARG_OPTION_KEYRING "keyring"
+#define RESET_ITEMS_COMMAND_ARG_OPTION_BUYBACK "buyback"
+#define RESET_ITEMS_COMMAND_ARG_OPTION_ALL "all"
+#define RESET_ITEMS_COMMAND_ARG_OPTION_ALL_BAGS "allbags"
+
+#define RESET_MAIL_COMMAND_ARG_OPTION_COD  "cod"
+#define RESET_MAIL_COMMAND_ARG_OPTION_GM   "gm"
+#define RESET_MAIL_COMMAND_ARG_OPTION_ALL  "all"
+#define RESET_MAIL_COMMAND_ARG_OPTION_FROM "from"
+
+
+#define BITMASK_AND_SWITCH(x) \
+    for (uint64_t bit = 1; bit <= x+1; bit *= 2) if (x & bit) switch (bit)
+
+enum  ResetItemCommandArgFlags
+{
+    RESET_ITEMS_COMMAND_FLAG_OPTION_NONE       = 0x00,
+    RESET_ITEMS_COMMAND_FLAG_OPTION_EQUIPED    = 0x01,
+    RESET_ITEMS_COMMAND_FLAG_OPTION_BAGS       = 0x02,
+    RESET_ITEMS_COMMAND_FLAG_OPTION_BANK       = 0x04,
+    RESET_ITEMS_COMMAND_FLAG_OPTION_KEYRING    = 0x08,
+    RESET_ITEMS_COMMAND_FLAG_OPTION_BUYBACK    = 0x10,
+    RESET_ITEMS_COMMAND_FLAG_OPTION_ALL        = 
+     (
+        RESET_ITEMS_COMMAND_FLAG_OPTION_EQUIPED 
+      | RESET_ITEMS_COMMAND_FLAG_OPTION_BAGS
+      | RESET_ITEMS_COMMAND_FLAG_OPTION_BANK
+      | RESET_ITEMS_COMMAND_FLAG_OPTION_KEYRING
+      | RESET_ITEMS_COMMAND_FLAG_OPTION_BUYBACK
+      ),
+    RESET_ITEMS_COMMAND_FLAG_OPTION_ALL_BAGS = RESET_ITEMS_COMMAND_FLAG_OPTION_ALL << 1 | 1, // Will also delete bank bags and equiped bags
+};
+
+enum ResetMailCommandArgFlags
+{
+    RESET_MAIL_COMMAND_FLAG_OPTION_NONE    = 0x00,
+    RESET_MAIL_COMMAND_FLAG_OPTION_COD     = 0x01,
+    RESET_MAIL_COMMAND_FLAG_OPTION_GM      = 0x02,
+    RESET_MAIL_COMMAND_FLAG_OPTION_ALL     = ( RESET_MAIL_COMMAND_FLAG_OPTION_COD | RESET_MAIL_COMMAND_FLAG_OPTION_GM ),
+    RESET_MAIL_COMMAND_FLAG_OPTION_FROM    = 0x04,
+};
 
 class ChatHandler
 {
@@ -93,6 +164,7 @@ class ChatHandler
         void SendSysMessage(int32     entry);
         void PSendSysMessage(const char* format, ...) ATTR_PRINTF(2, 3);
         void PSendSysMessage(int32     entry, ...);
+        void PSendSysMessageMultiline(int32 entry, ...);
 
         bool ParseCommands(const char* text);
         ChatCommand const* FindCommand(char const* text);
@@ -105,7 +177,7 @@ class ChatHandler
         *
         * Method:    BuildChatPacket build message chat packet generic way
         * FullName:  ChatHandler::BuildChatPacket
-        * Access:    public static 
+        * Access:    public static
         * Returns:   void
         *
         * \param WorldPacket& data             : Provided packet will be filled with requested info
@@ -144,7 +216,7 @@ class ChatHandler
 
         void SendGlobalSysMessage(const char* str, AccountTypes minSec = SEC_PLAYER);
 
-        bool SetDataForCommandInTable(ChatCommand* table, const char* text, uint32 security, std::string const& help);
+        bool SetDataForCommandInTable(ChatCommand* table, uint32 id, const char* text, uint32 security, std::string const& help);
         void ExecuteCommand(const char* text);
         void LogCommand(char const* fullcmd);
 
@@ -436,6 +508,7 @@ class ChatHandler
         bool HandleReloadLocalesPageTextCommand(char* args);
         bool HandleReloadLocalesPointsOfInterestCommand(char* args);
         bool HandleReloadLocalesQuestCommand(char* args);
+        bool HandleReloadLocalesCommandHelpCommand(char* args);
         bool HandleReloadLootTemplatesCreatureCommand(char* args);
         bool HandleReloadLootTemplatesDisenchantCommand(char* args);
         bool HandleReloadLootTemplatesFishingCommand(char* args);
@@ -481,6 +554,8 @@ class ChatHandler
         bool HandleResetSpellsCommand(char* args);
         bool HandleResetStatsCommand(char* args);
         bool HandleResetTalentsCommand(char* args);
+        bool HandleResetItemsCommand(char* args);
+        bool HandleResetMailCommand(char* args);
 
         bool HandleSendItemsCommand(char* args);
         bool HandleSendMailCommand(char* args);
@@ -534,6 +609,8 @@ class ChatHandler
         bool HandleSummonCommand(char* args);
         bool HandleAppearCommand(char* args);
         bool HandleGroupgoCommand(char* args);
+        bool HandleAuraGroupCommand(char* args);
+        bool HandleUnAuraGroupCommand(char* args);
         bool HandleRecallCommand(char* args);
         bool HandleAnnounceCommand(char* args);
         bool HandleNotifyCommand(char* args);

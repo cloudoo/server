@@ -73,7 +73,9 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
     uint8 race = availableRaces[cls][urand(0, availableRaces[cls].size() - 1)];
     string name = CreateRandomBotName();
     if (name.empty())
+    {
         return false;
+    }
 
     uint8 skin = urand(0, 7);
     uint8 face = urand(0, 7);
@@ -113,18 +115,20 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
 
 string RandomPlayerbotFactory::CreateRandomBotName()
 {
-    QueryResult *result = CharacterDatabase.Query("SELECT MAX(name_id) FROM ai_playerbot_names");
+    QueryResult *result = CharacterDatabase.Query("SELECT MAX(`name_id`) FROM `ai_playerbot_names`");
     if (!result)
+    {
         return "";
+    }
 
     Field *fields = result->Fetch();
     uint32 maxId = fields[0].GetUInt32();
     delete result;
 
     uint32 id = urand(0, maxId);
-    result = CharacterDatabase.PQuery("SELECT n.name FROM ai_playerbot_names n "
-            "LEFT OUTER JOIN characters e ON e.name = n.name "
-            "WHERE e.guid IS NULL AND n.name_id >= '%u' LIMIT 1", id);
+    result = CharacterDatabase.PQuery("SELECT `n`.`name` FROM `ai_playerbot_names` n "
+            "LEFT OUTER JOIN `characters` e ON `e`.`name` = `n`.`name` "
+            "WHERE `e`.`guid` IS NULL AND `n`.`name_id` >= '%u' LIMIT 1", id);
     if (!result)
     {
         sLog.outError("No more names left for random bots");

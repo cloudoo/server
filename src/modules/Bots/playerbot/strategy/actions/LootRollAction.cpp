@@ -20,7 +20,9 @@ bool LootRollAction::Execute(Event event)
 
     Group* group = bot->GetGroup();
     if(!group)
+    {
         return false;
+    }
 
     RollVote vote = ROLL_PASS;
 
@@ -32,11 +34,15 @@ bool LootRollAction::Execute(Event event)
         case ITEM_CLASS_WEAPON:
         case ITEM_CLASS_ARMOR:
             if (QueryItemUsage(proto))
+            {
                 vote = ROLL_NEED;
+            }
             break;
         default:
             if (IsLootAllowed(guid.GetEntry()))
+            {
                 vote = ROLL_NEED;
+            }
             break;
         }
     }

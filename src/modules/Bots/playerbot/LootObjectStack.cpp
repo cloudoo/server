@@ -20,7 +20,9 @@ LootTarget::LootTarget(LootTarget const& other)
 LootTarget& LootTarget::operator=(LootTarget const& other)
 {
     if((void*)this == (void*)&other)
+    {
         return *this;
+    }
 
     guid = other.guid;
     asOfTime = other.asOfTime;
@@ -38,9 +40,13 @@ void LootTargetList::shrink(time_t fromTime)
     for (set<LootTarget>::iterator i = begin(); i != end(); )
     {
         if (i->asOfTime <= fromTime)
+        {
             erase(i++);
+        }
         else
+        {
             ++i;
+        }
     }
 }
 
@@ -62,7 +68,9 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
     if (creature && creature->GetDeathState() == CORPSE)
     {
         if (creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE))
+        {
             this->guid = guid;
+        }
 
         if (creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
         {
@@ -70,7 +78,9 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
             uint32 targetLevel = creature->getLevel();
             reqSkillValue = targetLevel < 10 ? 0 : targetLevel < 20 ? (targetLevel - 10) * 10 : targetLevel * 5;
             if (bot->HasSkill(skillId) && bot->GetSkillValue(skillId) >= reqSkillValue)
+            {
                 this->guid = guid;
+            }
         }
 
         return;
@@ -82,7 +92,9 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
         uint32 lockId = go->GetGOInfo()->GetLockId();
         LockEntry const *lockInfo = sLockStore.LookupEntry(lockId);
         if (!lockInfo)
+        {
             return;
+        }
 
         for (int i = 0; i < 8; ++i)
         {
@@ -118,11 +130,15 @@ WorldObject* LootObject::GetWorldObject(Player* bot)
 
     Creature *creature = ai->GetCreature(guid);
     if (creature && creature->GetDeathState() == CORPSE)
+    {
         return creature;
+    }
 
     GameObject* go = ai->GetGameObject(guid);
     if (go && go->isSpawned())
+    {
         return go;
+    }
 
     return NULL;
 }
@@ -138,28 +154,42 @@ LootObject::LootObject(const LootObject& other)
 bool LootObject::IsLootPossible(Player* bot)
 {
     if (IsEmpty() || !GetWorldObject(bot))
+    {
         return false;
+    }
 
     PlayerbotAI* ai = bot->GetPlayerbotAI();
 
     if (reqItem && !bot->HasItemCount(reqItem, 1))
+    {
         return false;
+    }
 
     if (skillId == SKILL_NONE)
+    {
         return true;
+    }
 
     if (skillId == SKILL_FISHING)
+    {
         return false;
+    }
 
     if (!bot->HasSkill(skillId))
+    {
         return false;
+    }
 
     if (!reqSkillValue)
+    {
         return true;
+    }
 
     uint32 skillValue = uint32(bot->GetPureSkillValue(skillId));
     if (reqSkillValue > skillValue)
+    {
         return false;
+    }
 
     return true;
 }
@@ -167,14 +197,20 @@ bool LootObject::IsLootPossible(Player* bot)
 bool LootObjectStack::Add(ObjectGuid guid)
 {
     if (!availableLoot.insert(guid).second)
+    {
         return false;
+    }
 
     if (availableLoot.size() < MAX_LOOT_OBJECT_COUNT)
+    {
         return true;
+    }
 
     vector<LootObject> ordered = OrderByDistance();
     for (size_t i = MAX_LOOT_OBJECT_COUNT; i < ordered.size(); i++)
+    {
         Remove(ordered[i].guid);
+    }
 
     return true;
 }
@@ -183,7 +219,9 @@ void LootObjectStack::Remove(ObjectGuid guid)
 {
     LootTargetList::iterator i = availableLoot.find(guid);
     if (i != availableLoot.end())
+    {
         availableLoot.erase(i);
+    }
 }
 
 void LootObjectStack::Clear()
@@ -214,16 +252,22 @@ vector<LootObject> LootObjectStack::OrderByDistance(float maxDistance)
         ObjectGuid guid = i->guid;
         LootObject lootObject(bot, guid);
         if (!lootObject.IsLootPossible(bot))
+        {
             continue;
+        }
 
         float distance = bot->GetDistance(lootObject.GetWorldObject(bot));
         if (!maxDistance || distance <= maxDistance)
+        {
             sortedMap[distance] = lootObject;
+        }
     }
 
     vector<LootObject> result;
     for (map<float, LootObject>::iterator i = sortedMap.begin(); i != sortedMap.end(); i++)
+    {
         result.push_back(i->second);
+    }
     return result;
 }
 

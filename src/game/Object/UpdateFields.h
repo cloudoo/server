@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2019  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2020 MaNGOS <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ enum EContainerFields
     CONTAINER_ALIGN_PAD                        = ITEM_END + 0x01, // Size:1
     CONTAINER_FIELD_SLOT_1                     = ITEM_END + 0x02, // count=56
     CONTAINER_FIELD_SLOT_LAST                  = ITEM_END + 0x38,
-    CONTAINER_END                              = ITEM_END + 0x3A,
+    CONTAINER_END                              = ITEM_END + 0x4A,
 };
 
 /**

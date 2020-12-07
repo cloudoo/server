@@ -118,7 +118,9 @@ bool Engine::DoNextAction(Unit* unit, int depth)
 {
     LogAction("--- AI Tick ---");
     if (sPlayerbotAIConfig.logValuesPerTick)
+    {
         LogValues();
+    }
 
     bool actionExecuted = false;
     ActionBasket* basket = NULL;
@@ -133,7 +135,9 @@ bool Engine::DoNextAction(Unit* unit, int depth)
         basket = queue.Peek();
         if (basket) {
             if (++iterations > iterationsPerTick)
+            {
                 break;
+            }
 
             float relevance = basket->getRelevance(); // just for reference
             bool skipPrerequisites = basket->isSkipPrerequisites();
@@ -205,15 +209,21 @@ bool Engine::DoNextAction(Unit* unit, int depth)
         lastRelevance = 0.0f;
         PushDefaultActions();
         if (queue.Peek() && depth < 2)
+        {
             return DoNextAction(unit, depth + 1);
+        }
     }
 
     if (time(0) - currentTime > 1) {
+    {
         LogAction("too long execution");
+    }
     }
 
     if (!actionExecuted)
+    {
         LogAction("no actions executed");
+    }
 
     return actionExecuted;
 }
@@ -225,7 +235,9 @@ ActionNode* Engine::CreateActionNode(string name)
         Strategy* strategy = i->second;
         ActionNode* node = strategy->GetAction(name);
         if (node)
+        {
             return node;
+        }
     }
     return new ActionNode (name,
         /*P*/ NULL,
@@ -262,7 +274,9 @@ bool Engine::MultiplyAndPush(NextAction** actions, float forceRelevance, bool sk
                 delete nextAction;
             }
             else
+            {
                 break;
+            }
         }
         delete actions;
     }
@@ -275,11 +289,15 @@ ActionResult Engine::ExecuteAction(string name)
 
     ActionNode *actionNode = CreateActionNode(name);
     if (!actionNode)
+    {
         return ACTION_RESULT_UNKNOWN;
+    }
 
     Action* action = InitializeAction(actionNode);
     if (!action)
+    {
         return ACTION_RESULT_UNKNOWN;
+    }
 
     if (!action->isPossible())
     {
@@ -310,7 +328,9 @@ void Engine::addStrategy(string name)
     {
         set<string> siblings = aiObjectContext->GetSiblingStrategy(name);
         for (set<string>::iterator i = siblings.begin(); i != siblings.end(); i++)
+        {
             removeStrategy(*i);
+        }
 
         LogAction("S:+%s", strategy->getName().c_str());
         strategies[strategy->getName()] = strategy;
@@ -330,7 +350,9 @@ void Engine::addStrategies(string first, ...)
     {
         cur = va_arg(vl, const char*);
         if (cur)
+        {
             addStrategy(cur);
+        }
     }
     while (cur);
 
@@ -341,7 +363,9 @@ bool Engine::removeStrategy(string name)
 {
     map<string, Strategy*>::iterator i = strategies.find(name);
     if (i == strategies.end())
+    {
         return false;
+    }
 
     LogAction("S:-%s", name.c_str());
     strategies.erase(i);
@@ -358,7 +382,9 @@ void Engine::removeAllStrategies()
 void Engine::toggleStrategy(string name)
 {
     if (!removeStrategy(name))
+    {
         addStrategy(name);
+    }
 }
 
 bool Engine::HasStrategy(string name)
@@ -372,7 +398,9 @@ void Engine::ProcessTriggers()
     {
         TriggerNode* node = *i;
         if (!node)
+        {
             continue;
+        }
 
         Trigger* trigger = node->getTrigger();
         if (!trigger)
@@ -382,13 +410,17 @@ void Engine::ProcessTriggers()
         }
 
         if (!trigger)
+        {
             continue;
+        }
 
         if (testMode || trigger->needCheck())
         {
             Event event = trigger->Check();
             if (!event)
+            {
                 continue;
+            }
 
             LogAction("T:%s", trigger->getName().c_str());
             MultiplyAndPush(node->getHandlers(), 0.0f, false, event);
@@ -416,7 +448,9 @@ string Engine::ListStrategies()
     string s = "Strategies: ";
 
     if (strategies.empty())
+    {
         return s;
+    }
 
     for (map<string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
     {
@@ -441,7 +475,9 @@ bool Engine::ContainsStrategy(StrategyType type)
     {
         Strategy* strategy = i->second;
         if (strategy->GetType() & type)
+        {
             return true;
+        }
     }
     return false;
 }
@@ -492,7 +528,9 @@ void Engine::LogAction(const char* format, ...)
     {
         Player* bot = ai->GetBot();
         if (sPlayerbotAIConfig.logInGroupOnly && !bot->GetGroup())
+        {
             return;
+        }
 
         sLog.outDebug("%s %s", bot->GetName(), buf);
     }
@@ -525,11 +563,15 @@ void Engine::ChangeStrategy(string names)
 void Engine::LogValues()
 {
     if (testMode)
+    {
         return;
+    }
 
     Player* bot = ai->GetBot();
     if (sPlayerbotAIConfig.logInGroupOnly && !bot->GetGroup())
+    {
         return;
+    }
 
     string text = ai->GetAiObjectContext()->FormatValues();
     sLog.outDebug("Values for %s: %s", bot->GetName(), text.c_str());

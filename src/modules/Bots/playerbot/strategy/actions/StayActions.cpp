@@ -12,7 +12,9 @@ void StayActionBase::Stay()
 
     MotionMaster &mm = *bot->GetMotionMaster();
     if (mm.GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE || bot->IsTaxiFlying())
+    {
         return;
+    }
 
     mm.Clear();
     mm.MoveIdle();
@@ -20,7 +22,9 @@ void StayActionBase::Stay()
     bot->clearUnitState( UNIT_STAT_FOLLOW );
 
     if (!bot->IsStandState())
+    {
         bot->SetStandState(UNIT_STAND_STATE_STAND);
+    }
 }
 
 bool StayActionBase::StayLine(vector<Player*> line, float diff, float cx, float cy, float cz, float orientation, float range)
@@ -45,7 +49,9 @@ bool StayActionBase::StayLine(vector<Player*> line, float diff, float cx, float 
 
         bool ok = StaySingleLine(singleLine, diff, x, y, cz, orientation, range);
         if (ok)
+        {
             return true;
+        }
     }
 
     return false;
@@ -100,10 +106,14 @@ float range = 2.0f;
 Unit* target = AI_VALUE(Unit*, "current target");
 Player* master = GetMaster();
 if (!target)
- target = master;
+{
+    target = master;
+}
 
 if (!target)
- return false;
+{
+    return false;
+}
 
 switch (bot->getClass())
  {
@@ -115,11 +125,15 @@ range = sPlayerbotAIConfig.fleeDistance;
 break;
 case CLASS_DRUID:
 if (!ai->IsTank(bot))
- range = sPlayerbotAIConfig.fleeDistance;
+{
+    range = sPlayerbotAIConfig.fleeDistance;
+}
 break;
 case CLASS_SHAMAN:
 if (ai->IsHeal(bot))
- range = sPlayerbotAIConfig.fleeDistance;
+{
+    range = sPlayerbotAIConfig.fleeDistance;
+}
 break;
 }
 
@@ -135,13 +149,17 @@ bool StayLineAction::Execute(Event event)
  {
 Group* group = bot->GetGroup();
 if (!group)
- return false;
+{
+    return false;
+}
 
 float range = 2.0f;
 
 Player* master = GetMaster();
 if (!master)
- return false;
+{
+    return false;
+}
 
 float x = master->GetPositionX();
 float y = master->GetPositionY();
@@ -154,7 +172,9 @@ while (gref)
 {
 Player* member = gref->getSource();
 if (member != master)
- players.push_back(member);
+{
+    players.push_back(member);
+}
 
 gref = gref->next();
 }
@@ -168,13 +188,17 @@ bool StayCombatAction::Execute(Event event)
  {
 Group* group = bot->GetGroup();
 if (!group)
- return false;
+{
+    return false;
+}
 
 float range = 2.0f;
 
 Player* master = GetMaster();
 if (!master)
- return false;
+{
+    return false;
+}
 
 float x = master->GetPositionX();
 float y = master->GetPositionY();
@@ -190,18 +214,26 @@ Player* member = gref->getSource();
 if (member != master)
  {
 if (ai->IsTank(member))
- tanks.push_back(member);
+{
+    tanks.push_back(member);
+}
 else
- dps.push_back(member);
+{
+    dps.push_back(member);
+}
 }
 
 gref = gref->next();
 }
 
 if (ai->IsTank(master))
- tanks.insert(tanks.begin() + (tanks.size() + 1) / 2, master);
+{
+    tanks.insert(tanks.begin() + (tanks.size() + 1) / 2, master);
+}
 else
- dps.insert(dps.begin() + (dps.size() + 1) / 2, master);
+{
+    dps.insert(dps.begin() + (dps.size() + 1) / 2, master);
+}
 
 switch (rand() % 50)
  {

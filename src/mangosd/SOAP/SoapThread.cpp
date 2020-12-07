@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2019  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2020 MaNGOS <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,13 +41,19 @@ struct SOAPCommand
 {
     public:
         void appendToPrintBuffer(const char* msg)
-          { m_printBuffer += msg; }
+        {
+            m_printBuffer += msg;
+        }
 
         void setCommandSuccess(bool val)
-         { m_success = val; }
+        {
+            m_success = val;
+        }
 
         bool hasCommandSucceeded()
-          { return m_success; }
+        {
+            return m_success;
+        }
 
         static void print(void* callbackArg, const char* msg)
         {
@@ -100,8 +106,10 @@ class SoapPool : public ACE_Task<ACE_MT_SYNCH>
 
 SoapThread::~SoapThread()
 {
-  if(pool_)
-      delete pool_;
+    if(pool_)
+    {
+        delete pool_;
+    }
 }
 
 int SoapThread::open(void* unused)
@@ -197,7 +205,9 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     }
 
     if (!command || !*command)
-        { return soap_sender_fault(soap, "Command mustn't be empty", "The supplied command was an empty string"); }
+    {
+        return soap_sender_fault(soap, "Command mustn't be empty", "The supplied command was an empty string");
+    }
 
     DEBUG_LOG("MaNGOSsoap: got command '%s'", command);
     SOAPCommand connection;
@@ -218,7 +228,9 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         return SOAP_OK;
     }
     else
-        { return soap_sender_fault(soap, printBuffer, printBuffer); }
+    {
+        return soap_sender_fault(soap, printBuffer, printBuffer);
+    }
 }
 
 void SOAPCommand::commandFinished(void* soapconnection, bool success)

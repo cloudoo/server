@@ -9,7 +9,9 @@ map<string, uint32> EmoteAction::emotes;
 bool EmoteAction::Execute(Event event)
 {
     if (emotes.empty())
+    {
         InitEmotes();
+    }
 
     uint32 emote = 0;
 
@@ -18,7 +20,9 @@ bool EmoteAction::Execute(Event event)
     {
         int index = rand() % emotes.size();
         for (map<string, uint32>::iterator i = emotes.begin(); i != emotes.end() && index; ++i, --index)
+        {
             emote = i->second;
+        }
     }
     else
     {

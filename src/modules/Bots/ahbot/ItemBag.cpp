@@ -44,13 +44,17 @@ CategoryList::CategoryList()
 void CategoryList::Add(Category* category)
 {
     for (uint32 quality = ITEM_QUALITY_NORMAL; quality <= ITEM_QUALITY_EPIC; ++quality)
+    {
         categories.push_back(new QualityCategoryWrapper(category, quality));
+    }
 }
 
 CategoryList::~CategoryList()
 {
     for (vector<Category*>::const_iterator i = categories.begin(); i != categories.end(); ++i)
+    {
         delete *i;
+    }
 }
 
 ItemBag::ItemBag()
@@ -89,7 +93,9 @@ int32 ItemBag::GetCount(Category* category, uint32 item)
     for (vector<uint32>::iterator i = items.begin(); i != items.end(); ++i)
     {
         if (*i == item)
+        {
             count++;
+        }
     }
 
     return count;
@@ -103,16 +109,24 @@ bool ItemBag::Add(ItemPrototype const* proto)
         return false;
 
     if (proto->RequiredLevel > sAhBotConfig.maxRequiredLevel || proto->ItemLevel > sAhBotConfig.maxItemLevel)
+    {
         return false;
+    }
 
     if (proto->Duration & 0x80000000)
+    {
         return false;
+    }
 
     if (sAhBotConfig.ignoreItemIds.find(proto->ItemId) != sAhBotConfig.ignoreItemIds.end())
+    {
         return false;
+    }
 
     if (strstri(proto->Name1, "qa") || strstri(proto->Name1, "test") || strstri(proto->Name1, "deprecated"))
+    {
         return false;
+    }
 
     for (int i = 0; i < CategoryList::instance.size(); i++)
     {
@@ -130,7 +144,7 @@ void AvailableItemsBag::Load()
 {
     set<uint32> vendorItems;
 
-      QueryResult* results = WorldDatabase.PQuery("SELECT item FROM npc_vendor where maxcount = 0");
+      QueryResult* results = WorldDatabase.PQuery("SELECT `item` FROM `npc_vendor` WHERE `maxcount` = 0");
       if (results != NULL)
       {
           do
@@ -145,7 +159,9 @@ void AvailableItemsBag::Load()
       for (uint32 itemId = 0; itemId < sItemStorage.GetMaxEntry(); ++itemId)
       {
           if (vendorItems.find(itemId) != vendorItems.end())
+          {
               continue;
+          }
 
         Add(sObjectMgr.GetItemPrototype(itemId));
     }
@@ -156,7 +172,9 @@ void InAuctionItemsBag::Load()
 {
     AuctionHouseEntry const* ahEntry = sAuctionHouseStore.LookupEntry(auctionId);
     if(!ahEntry)
+    {
         return;
+    }
 
     AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(ahEntry);
     AuctionHouseObject::AuctionEntryMap const& auctionEntryMap = auctionHouse->GetAuctions();
@@ -164,7 +182,9 @@ void InAuctionItemsBag::Load()
     {
         ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itr->second->itemTemplate);
         if (!proto)
+        {
             continue;
+        }
 
         Add(proto);
     }

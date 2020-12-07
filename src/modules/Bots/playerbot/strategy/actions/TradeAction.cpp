@@ -21,10 +21,14 @@ bool TradeAction::Execute(Event event)
 
     list<Item*> found = parseItems(text);
     if (found.empty())
+    {
         return false;
+    }
 
     for (list<Item*>::iterator i = found.begin(); i != found.end(); i++)
+    {
         TradeItem(**i, slot);
+    }
 
     return true;
 }
@@ -32,20 +36,28 @@ bool TradeAction::Execute(Event event)
 bool TradeAction::TradeItem(const Item& item, int8 slot)
 {
     if (!bot->GetTrader() || item.IsInTrade())
+    {
         return false;
+    }
 
     if (!item.CanBeTraded() && slot != TRADE_SLOT_NONTRADED)
+    {
         slot = TRADE_SLOT_NONTRADED;
+    }
 
     int8 tradeSlot = -1;
     Item* itemPtr = const_cast<Item*>(&item);
 
     TradeData* pTrade = bot->GetTradeData();
     if ((slot >= 0 && slot < TRADE_SLOT_COUNT) && pTrade->GetItem(TradeSlots(slot)) == NULL)
+    {
         tradeSlot = slot;
+    }
 
     if (slot == TRADE_SLOT_NONTRADED)
+    {
         pTrade->SetItem(TRADE_SLOT_NONTRADED, itemPtr);
+    }
     else
     {
         for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT && tradeSlot == -1; i++)

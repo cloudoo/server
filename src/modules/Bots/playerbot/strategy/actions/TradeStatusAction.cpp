@@ -17,7 +17,9 @@ bool TradeStatusAction::Execute(Event event)
     Player* trader = bot->GetTrader();
     Player* master = GetMaster();
     if (!trader)
+    {
         return false;
+    }
 
     if (trader != master)
     {
@@ -50,7 +52,9 @@ bool TradeStatusAction::Execute(Event event)
 
             bot->GetSession()->HandleAcceptTradeOpcode(p);
             if (bot->GetTradeData())
+            {
                 return false;
+            }
 
             if (sRandomPlayerbotMgr.IsRandomBot(bot))
             {
@@ -63,7 +67,9 @@ bool TradeStatusAction::Execute(Event event)
     else if (status == TRADE_STATUS_BEGIN_TRADE)
     {
         if (!bot->IsInFront(trader, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+        {
             bot->SetFacingToObject(trader);
+        }
         BeginTrade();
         return true;
     }
@@ -97,11 +103,15 @@ void TradeStatusAction::BeginTrade()
 bool TradeStatusAction::CheckTrade()
 {
     if (!sRandomPlayerbotMgr.IsRandomBot(bot))
+    {
         return true;
+    }
 
     Player* master = GetMaster();
     if (!bot->GetTradeData() || !master->GetTradeData())
+    {
         return false;
+    }
 
     for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
     {
@@ -135,7 +145,9 @@ bool TradeStatusAction::CheckTrade()
     int32 playerMoney = master->GetTradeData()->GetMoney() + playerItemsMoney;
 
     if (!botMoney && !playerMoney)
+    {
         return true;
+    }
 
     if (!botItemsMoney && !playerItemsMoney)
     {
@@ -174,21 +186,29 @@ bool TradeStatusAction::CheckTrade()
 int32 TradeStatusAction::CalculateCost(TradeData* data, bool sell)
 {
     if (!data)
+    {
         return 0;
+    }
 
     uint32 sum = 0;
     for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
     {
         Item* item = data->GetItem((TradeSlots)slot);
         if (!item)
+        {
             continue;
+        }
 
         ItemPrototype const* proto = item->GetProto();
         if (!proto)
+        {
             continue;
+        }
 
         if (proto->Quality < ITEM_QUALITY_NORMAL)
+        {
             return 0;
+        }
 
         if (sell)
         {

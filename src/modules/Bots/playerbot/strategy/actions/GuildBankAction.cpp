@@ -11,14 +11,18 @@ using namespace ai;
 {
     string text = event.getParam();
     if (text.empty())
+    {
         return false;
+    }
 
     list<ObjectGuid> gos = AI_VALUE(list<ObjectGuid>, "nearest game objects");
     for (list<ObjectGuid>::iterator i = gos.begin(); i != gos.end(); i++)
     {
         GameObject* go = ai->GetGameObject(*i);
         if (!go || !bot->GetGameObjectIfCanInteractWith(go->GetObjectGuid(), GAMEOBJECT_TYPE_GUILD_BANK))
+        {
             continue;
+        }
 
         return Execute(text, go);
     }
@@ -33,13 +37,17 @@ bool GuildBankAction::Execute(string text, GameObject* bank)
 
     list<Item*> found = parseItems(text);
     if (found.empty())
+    {
         return false;
+    }
 
     for (list<Item*>::iterator i = found.begin(); i != found.end(); i++)
     {
         Item* item = *i;
         if (item)
+        {
             result &= MoveFromCharToBank(item, bank);
+        }
     }
 
     return result;

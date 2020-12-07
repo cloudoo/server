@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2019  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2020 MaNGOS <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ class Aura;
 class Creature;
 class CreatureAI;
 class GameObject;
+class GameObjectAI;
 class InstanceData;
 class Item;
 class Map;
@@ -424,7 +425,11 @@ struct ScriptInfo
             uint32 empty;                                   // datalong2
         } fly;
 
-        // datalong unused                                  // SCRIPT_COMMAND_DESPAWN_GO (40)
+        struct                                              // SCRIPT_COMMAND_DESPAWN_GO (40)
+        {
+            uint32 goGuid;                                  //datalong
+            uint32 respawnTime;                             //datalong2
+        } despawnGo;
         // datalong unused                                  // SCRIPT_COMMAND_RESPAWN (41)
 
         struct                                              // SCRIPT_COMMAND_SET_EQUIPMENT_SLOTS (42)
@@ -466,6 +471,8 @@ struct ScriptInfo
         {
             case SCRIPT_COMMAND_RESPAWN_GO:
                 return respawnGo.goGuid;
+            case SCRIPT_COMMAND_DESPAWN_GO:
+                return despawnGo.goGuid;
             case SCRIPT_COMMAND_OPEN_DOOR:
             case SCRIPT_COMMAND_CLOSE_DOOR:
                 return changeDoor.goGuid;
@@ -648,6 +655,9 @@ class ScriptMgr
         static bool CanSpellEffectStartDBScript(SpellEntry const* spellinfo, SpellEffectIndex effIdx);
 
         CreatureAI* GetCreatureAI(Creature* pCreature);
+
+        GameObjectAI* GetGameObjectAI(GameObject* pGo);
+
         InstanceData* CreateInstanceData(Map* pMap);
 
         char const* GetScriptLibraryVersion() const;
@@ -663,6 +673,7 @@ class ScriptMgr
         uint32 GetDialogStatus(Player* pPlayer, Creature* pCreature);
         uint32 GetDialogStatus(Player* pPlayer, GameObject* pGameObject);
         bool OnGameObjectUse(Player* pPlayer, GameObject* pGameObject);
+        bool OnGameObjectUse(Unit* pUnit, GameObject* pGameObject);
         bool OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets);
         bool OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry);
         bool OnProcessEvent(uint32 eventId, Object* pSource, Object* pTarget, bool isStart);
@@ -685,7 +696,7 @@ class ScriptMgr
         ScriptNameMap      m_scriptNames;
         DBScripts          m_dbScripts;
 #ifdef _DEBUG
-        // mutex allowing to reload the script binding table
+        // mutex allowing to reload the script binding table; TODO just do it AWAY from any map update, e.g. right after sessions update
         ACE_RW_Thread_Mutex m_bindMutex;
 #endif /* _DEBUG */
         // atomic op counter for active scripts amount
